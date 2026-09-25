@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LivablePH — Student Housing & Livability Map</title>
+  <title>LivablePH — MSU-IIT Student Housing & Livability Intelligence</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg: #090e17;
       --card-bg: #111827;
+      --card-hover: #172235;
       --card-border: #1f2937;
       --primary: #0284c7;
       --primary-hover: #0369a1;
@@ -24,14 +25,10 @@
       --danger: #ef4444;
       --text: #f3f4f6;
       --text-muted: #9ca3af;
-      --sidebar-width: 420px;
+      --sidebar-width: 440px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -51,13 +48,16 @@
       display: flex;
       flex-direction: column;
       z-index: 1000;
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
     }
 
     .brand-header {
-      padding: 20px 24px;
+      padding: 18px 24px;
       border-bottom: 1px solid var(--card-border);
       background: #0d131f;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .brand-title {
@@ -65,24 +65,23 @@
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .brand-title span {
-      color: var(--primary);
-    }
+    .brand-title span { color: var(--primary); }
 
-    .brand-tagline {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
+    .campus-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.4);
+      color: #38bdf8;
+      border-radius: 4px;
     }
 
     /* Filter Controls */
     .filter-panel {
-      padding: 16px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--card-border);
       background: #111827;
       display: flex;
@@ -90,26 +89,18 @@
       gap: 12px;
     }
 
-    .filter-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
     .search-input {
-      flex: 1;
-      background: #1f2937;
-      border: 1px solid #374151;
+      background: #182234;
+      border: 1px solid #283548;
       padding: 10px 14px;
       border-radius: 8px;
       color: #fff;
       font-size: 13px;
       outline: none;
+      width: 100%;
     }
 
-    .search-input:focus {
-      border-color: var(--primary);
-    }
+    .search-input:focus { border-color: var(--primary); }
 
     .range-group {
       display: flex;
@@ -136,11 +127,11 @@
     }
 
     .chip {
-      background: #1f2937;
-      border: 1px solid #374151;
-      padding: 6px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
+      background: #182234;
+      border: 1px solid #283548;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
       color: var(--text-muted);
       cursor: pointer;
       user-select: none;
@@ -156,12 +147,14 @@
 
     /* Listing List */
     .list-header {
-      padding: 12px 24px 8px;
-      font-size: 12px;
+      padding: 10px 20px 6px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-muted);
-      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
     }
 
     #listings-container {
@@ -174,15 +167,16 @@
     }
 
     .dorm-card {
-      background: #182234;
+      background: #141d2d;
       border: 1px solid #233044;
       border-radius: 10px;
       padding: 14px 16px;
       cursor: pointer;
-      transition: border-color 0.2s, transform 0.15s;
+      transition: all 0.15s ease;
     }
 
     .dorm-card:hover {
+      background: var(--card-hover);
       border-color: var(--primary);
       transform: translateY(-2px);
     }
@@ -196,7 +190,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .dorm-name {
@@ -205,50 +199,49 @@
       color: #fff;
     }
 
-    .dorm-price {
+    .dorm-score {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
       font-weight: 700;
-      font-size: 15px;
-      color: var(--accent);
     }
 
-    .dorm-location {
+    .score-high { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+    .score-med { background: #78350f; color: #fde68a; border: 1px solid #d97706; }
+    .score-low { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+
+    .dorm-price-row {
+      display: flex;
+      justify-content: space-between;
       font-size: 12px;
       color: var(--text-muted);
       margin-bottom: 8px;
     }
 
+    .dorm-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
     .badge-row {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
     .badge {
-      font-size: 11px;
-      padding: 2px 8px;
+      font-size: 10px;
+      padding: 2px 7px;
       border-radius: 4px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
-    .badge-signal {
-      background: #064e3b;
-      color: #6ee7b7;
-    }
-
-    .badge-flood {
-      background: #78350f;
-      color: #fde68a;
-    }
-
-    .badge-flood-safe {
-      background: #14532d;
-      color: #86efac;
-    }
-
-    .badge-water {
-      background: #1e3a8a;
-      color: #93c5fd;
-    }
+    .badge-gray { background: #1f2937; color: #cbd5e1; }
+    .badge-green { background: #064e3b; color: #6ee7b7; }
+    .badge-amber { background: #451a03; color: #fde68a; }
+    .badge-red { background: #450a0a; color: #fca5a5; }
 
     /* Map Area */
     #map-container {
@@ -257,11 +250,7 @@
       position: relative;
     }
 
-    #map {
-      width: 100%;
-      height: 100%;
-      background: #0a0f1d;
-    }
+    #map { width: 100%; height: 100%; }
 
     /* Map Layer Toggle Box */
     .map-controls {
@@ -269,24 +258,25 @@
       top: 16px;
       right: 16px;
       z-index: 1000;
-      background: rgba(17, 24, 39, 0.92);
+      background: rgba(17, 24, 39, 0.94);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(8px);
-      padding: 12px 16px;
+      backdrop-filter: blur(10px);
+      padding: 14px 18px;
       border-radius: 10px;
       font-size: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
     }
 
     .map-controls-title {
       font-weight: 700;
+      font-family: 'Space Mono', monospace;
       color: var(--text);
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      margin-bottom: 2px;
     }
 
     .map-control-item {
@@ -295,88 +285,141 @@
       gap: 8px;
       cursor: pointer;
       color: var(--text-muted);
+      font-size: 12px;
     }
 
-    .map-control-item input {
-      accent-color: var(--primary);
-    }
+    .map-control-item input { accent-color: var(--primary); }
 
-    /* Modal / Bottom Drawer */
+    /* Detailed Modal / Bottom Sheet */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(4px);
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
       z-index: 2000;
       display: none;
       align-items: center;
       justify-content: center;
     }
 
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
 
     .modal-content {
       background: #111827;
       border: 1px solid #374151;
-      width: 90%;
-      max-width: 520px;
-      border-radius: 12px;
-      padding: 24px;
+      width: 92%;
+      max-width: 600px;
+      border-radius: 14px;
+      padding: 26px;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .modal-close {
       position: absolute;
-      top: 16px;
-      right: 16px;
-      background: transparent;
+      top: 18px;
+      right: 18px;
+      background: #1f2937;
       border: none;
-      color: var(--text-muted);
-      font-size: 20px;
+      color: #9ca3af;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover { color: #fff; background: #374151; }
+
+    .modal-header-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .modal-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      margin-bottom: 4px;
+      font-size: 22px;
+      margin-top: 2px;
+      color: #fff;
     }
 
-    .modal-meta {
+    .modal-location {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
-    .modal-grid {
+    /* Modal Metrics Section */
+    .section-label {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .metrics-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .modal-stat {
-      background: #1f2937;
+    .metric-box {
+      background: #182234;
+      border: 1px solid #233044;
       padding: 10px 14px;
       border-radius: 8px;
     }
 
-    .stat-label {
+    .metric-label {
       font-size: 11px;
       color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f3f4f6;
+      margin-top: 3px;
+    }
+
+    /* Telco Speed Matrix Table */
+    .telco-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 18px;
+      background: #141d2d;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #233044;
+    }
+
+    .telco-table th, .telco-table td {
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .telco-table th {
+      background: #1a2538;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 11px;
       text-transform: uppercase;
     }
 
-    .stat-val {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      margin-top: 2px;
+    .telco-table td {
+      border-top: 1px solid #1f2a3c;
     }
 
     .btn-contact {
@@ -393,21 +436,13 @@
       transition: background 0.2s;
     }
 
-    .btn-contact:hover {
-      background: var(--primary-hover);
-    }
+    .btn-contact:hover { background: var(--primary-hover); }
 
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column-reverse;
-      }
-      #sidebar {
-        width: 100%;
-        height: 50vh;
-      }
-      #map-container {
-        height: 50vh;
-      }
+    @media (max-width: 820px) {
+      body { flex-direction: column-reverse; }
+      #sidebar { width: 100%; height: 50vh; }
+      #map-container { height: 50vh; }
+      .metrics-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -416,8 +451,11 @@
   <!-- Sidebar -->
   <div id="sidebar">
     <div class="brand-header">
-      <div class="brand-title">Livable<span>PH</span></div>
-      <div class="brand-tagline">MSU-IIT Perimeter · Transparent Student Housing & Livability</div>
+      <div>
+        <div class="brand-title">Livable<span>PH</span></div>
+        <div style="font-size: 11px; color: var(--text-muted);">MSU-IIT Student Housing Intelligence</div>
+      </div>
+      <div class="campus-badge">ILIGAN HUB</div>
     </div>
 
     <!-- Filters -->
@@ -427,20 +465,25 @@
       <div class="range-group">
         <div class="range-label">
           <span>Max Monthly Rent</span>
-          <span id="priceLabel">₱3,500</span>
+          <span id="priceLabel" style="font-family: 'Space Mono', monospace; color: #38bdf8; font-weight: 700;">₱4,000</span>
         </div>
-        <input type="range" id="priceRange" min="1000" max="6000" step="250" value="3500" />
+        <input type="range" id="priceRange" min="1200" max="6000" step="200" value="4000" />
       </div>
 
       <div class="chip-container">
-        <div class="chip" data-filter="wifi">⚡ Strong Wi-Fi</div>
-        <div class="chip" data-filter="cr">🚿 Private CR</div>
-        <div class="chip" data-filter="floodSafe">🌊 Flood Free</div>
-        <div class="chip" data-filter="vacant">🟢 Vacant Now</div>
+        <div class="chip" data-filter="vacant">🟢 Available Now</div>
+        <div class="chip" data-filter="fiveG">📶 5G Ready</div>
+        <div class="chip" data-filter="floodSafe">🛡️ Zero Flood Risk</div>
+        <div class="chip" data-filter="privateCR">🚿 Private CR</div>
+        <div class="chip" data-filter="backupWater">💧 Water Tank</div>
       </div>
     </div>
 
-    <div class="list-header" id="countHeader">Showing 0 Boarding Houses</div>
+    <div class="list-header">
+      <span id="countHeader">10 Listings Found</span>
+      <span>Sorted by Livability Score</span>
+    </div>
+
     <div id="listings-container"></div>
   </div>
 
@@ -448,16 +491,20 @@
   <div id="map-container">
     <div id="map"></div>
 
-    <!-- Map Layers Toggle -->
+    <!-- Map Layer Controls -->
     <div class="map-controls">
-      <div class="map-controls-title">Environmental Overlays</div>
+      <div class="map-controls-title">Environmental Layers</div>
       <label class="map-control-item">
         <input type="checkbox" id="toggleFlood" checked />
-        <span>Known Flood Hazards</span>
+        <span>⚠️ DOST-NOAH Flood Basin (5-Yr)</span>
       </label>
       <label class="map-control-item">
         <input type="checkbox" id="toggleSignal" checked />
-        <span>High Signal Zones</span>
+        <span>📶 Smart/DITO 5G Corridor</span>
+      </label>
+      <label class="map-control-item">
+        <input type="checkbox" id="toggleWalk" checked />
+        <span>🚶 Well-Lit Campus Pedestrian Routes</span>
       </label>
     </div>
   </div>
@@ -466,41 +513,62 @@
   <div class="modal-overlay" id="modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-header-tag" id="mTag">VERIFIED RESIDENCE · SCORE 92/100</div>
       <div class="modal-title" id="mName">Dormitory Name</div>
-      <div class="modal-meta" id="mLocation">Tibanga, Iligan City</div>
+      <div class="modal-location" id="mLocation">Tibanga, Iligan City</div>
 
-      <div class="modal-grid">
-        <div class="modal-stat">
-          <div class="stat-label">Monthly Rate</div>
-          <div class="stat-val" id="mPrice">₱2,500/mo</div>
+      <!-- Core Living Metrics -->
+      <div class="section-label">LIVABILITY & NEIGHBORHOOD AUDIT</div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-label">Monthly Rate</div>
+          <div class="metric-value" id="mPrice">₱2,500/mo</div>
         </div>
-        <div class="modal-stat">
-          <div class="stat-label">Vacant Slots</div>
-          <div class="stat-val" id="mSlots">2 Available</div>
+        <div class="metric-box">
+          <div class="metric-label">Available Slots</div>
+          <div class="metric-value" id="mSlots">2 Available</div>
         </div>
-        <div class="modal-stat">
-          <div class="stat-label">Cellular Reception</div>
-          <div class="stat-val" id="mSignal">Smart 5G / Globe 4G</div>
+        <div class="metric-box">
+          <div class="metric-label">Water Reliability (24/7)</div>
+          <div class="metric-value" id="mWater">Gravity Tank Reserve</div>
         </div>
-        <div class="modal-stat">
-          <div class="stat-label">Water Reliability</div>
-          <div class="stat-val" id="mWater">24/7 with Tank</div>
+        <div class="metric-box">
+          <div class="metric-label">DOST NOAH Flood History</div>
+          <div class="metric-value" id="mFlood">Elevated / Zero Runoff</div>
         </div>
-        <div class="modal-stat">
-          <div class="stat-label">Flood Risk</div>
-          <div class="stat-val" id="mFlood">Elevated / Zero Flood</div>
+        <div class="metric-box">
+          <div class="metric-label">Proximity to Gate 1</div>
+          <div class="metric-value" id="mWalk">4 min walk (300m)</div>
         </div>
-        <div class="modal-stat">
-          <div class="stat-label">Distance to Campus</div>
-          <div class="stat-val" id="mDistance">5 min walk (Gate 1)</div>
+        <div class="metric-box">
+          <div class="metric-label">Night Walkability & Lighting</div>
+          <div class="metric-value" id="mLighting">Well-Lit Main Thoroughfare</div>
         </div>
       </div>
 
-      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;" id="mNotes">
-        Notes: Curfew at 10:00 PM. Visitors allowed until 7:00 PM. Electricity sub-metered.
+      <!-- Cellular Carrier Audit Table -->
+      <div class="section-label">INDOOR CELLULAR AUDIT (7 PM - 11 PM TEST)</div>
+      <table class="telco-table">
+        <thead>
+          <tr>
+            <th>Carrier</th>
+            <th>Signal</th>
+            <th>Avg Speed</th>
+            <th>Study Suitability</th>
+          </tr>
+        </thead>
+        <tbody id="mTelcoBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <!-- House Rules & Pricing Terms -->
+      <div class="section-label">TERMS & HOUSE POLICIES</div>
+      <div style="background: #141d2d; border: 1px solid #233044; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;" id="mPolicy">
+        Electricity: Sub-metered at ₱16/kWh. Curfew: 10:30 PM. Advance: 1 month. Deposit: 1 month. Cooking: Induction only.
       </div>
 
-      <a href="tel:09123456789" id="mContactBtn" class="btn-contact">Contact Landlord Directly</a>
+      <a href="tel:09123456789" id="mContactBtn" class="btn-contact">Call Landlord Directly</a>
     </div>
   </div>
 
@@ -508,297 +576,193 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <script>
-    // Initial Center: MSU-IIT, Iligan City (8.2412, 124.2438)
-    const map = L.map('map', { zoomControl: false }).setView([8.2415, 124.2440], 16);
-
+    // Map Setup centered on MSU-IIT, Iligan City (8.2415, 124.2440)
+    const map = L.map('map', { zoomControl: false }).setView([8.2418, 124.2442], 16);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Modern Carto Dark Matter Tiles
+    // CartoDB Dark Matter Basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(map);
 
-    // Campus Marker (MSU-IIT Anchor)
-    const campusMarker = L.circleMarker([8.2412, 124.2438], {
-      radius: 9,
-      fillColor: '#ef4444',
-      color: '#fff',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.9
-    }).addTo(map).bindPopup("<b>MSU-IIT Main Campus</b><br>Reference Hub");
+    // Campus Anchor Pin (MSU-IIT Overpass / Main Gate)
+    const campusIcon = L.divIcon({
+      className: 'campus-pin',
+      html: '<div style="background:#ef4444; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 12px #ef4444;"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+    L.marker([8.2415, 124.2440], { icon: campusIcon }).addTo(map).bindPopup("<b>MSU-IIT Main Campus (Tibanga Gate)</b><br>Reference Point");
 
-    // Boarding House Dataset around MSU-IIT / Tibanga / San Miguel
+    // 10 Detailed Boarding House Datasets
     const boardingHouses = [
       {
         id: 1,
-        name: "Emerald Student Residence",
-        price: 2200,
-        address: "Prk. 4, Tibanga (Near Gate 1)",
-        lat: 8.2428,
-        lng: 124.2445,
+        name: "Emerald Scholar Residence",
+        score: 94,
+        price: 2400,
+        address: "Purok 4, Tibanga (Behind Gate 1)",
+        lat: 8.2429,
+        lng: 124.2446,
         vacantSlots: 3,
-        wifi: true,
+        fiveG: true,
         privateCR: false,
         floodSafe: true,
-        signal: "Smart 5G / Globe LTE",
-        water: "Daily tank storage (24/7)",
-        distance: "4 min walk",
-        notes: "Strict curfew at 10 PM. No alcohol. Sub-metered electric fan only.",
-        phone: "+639171234567"
+        backupWater: true,
+        distance: "3 min walk (250m)",
+        waterDesc: "2,000L Overhead tank (24/7 pressure)",
+        floodDesc: "High ground. Zero waterlogging recorded during monsoons.",
+        lighting: "Grade A: Working LED municipal streetlights every 20m.",
+        policy: "Curfew: 10:30 PM. Sub-metered electric fan only (₱15/kWh). 1-mo advance, 1-mo deposit. Visitors till 8 PM.",
+        phone: "+639174567890",
+        telco: [
+          { carrier: "Smart / TNT", signal: "5G (5 Bars)", speed: "95 Mbps", status: "Optimal for Meets/Exams" },
+          { carrier: "Globe / TM", signal: "LTE (4 Bars)", speed: "32 Mbps", status: "Reliable" },
+          { carrier: "DITO", signal: "5G (4 Bars)", speed: "68 Mbps", status: "Very Good" }
+        ]
       },
       {
         id: 2,
         name: "San Miguel Heights Villa",
-        price: 3200,
-        address: "San Miguel Highway",
-        lat: 8.2445,
-        lng: 124.2420,
-        vacantSlots: 1,
-        wifi: true,
+        score: 91,
+        price: 3600,
+        address: "San Miguel Highway cor. Purok 3",
+        lat: 8.2452,
+        lng: 124.2422,
+        vacantSlots: 2,
+        fiveG: true,
         privateCR: true,
         floodSafe: true,
-        signal: "Smart 5G (Very Strong)",
-        water: "Continuous direct pressure",
-        distance: "7 min walk",
-        notes: "Visitors allowed until 8 PM. Induction cooker friendly.",
-        phone: "+639189876543"
+        backupWater: true,
+        distance: "7 min walk (550m)",
+        waterDesc: "Direct ICWS line with 1,500L booster pump",
+        floodDesc: "Safe elevation along national highway corridor.",
+        lighting: "Grade A: Well-lit highway sidewalk, safe for late night library study.",
+        policy: "Curfew: None (gate key provided). Induction cooking allowed. Sub-metered A/C ready. 2-mo deposit.",
+        phone: "+639189923344",
+        telco: [
+          { carrier: "Smart / TNT", signal: "5G (Full)", speed: "140 Mbps", status: "Extreme Performance" },
+          { carrier: "Globe / TM", signal: "5G (4 Bars)", speed: "88 Mbps", status: "Optimal" },
+          { carrier: "DITO", signal: "LTE (4 Bars)", speed: "28 Mbps", status: "Stable" }
+        ]
       },
       {
         id: 3,
-        name: "Riverside Boarding Annex",
+        name: "Tibanga Riverside Lodge",
+        score: 62,
         price: 1500,
         address: "Lower Tibanga Riverside",
-        lat: 8.2395,
-        lng: 124.2465,
+        lat: 8.2392,
+        lng: 124.2472,
         vacantSlots: 4,
-        wifi: false,
+        fiveG: false,
         privateCR: false,
-        floodSafe: false, // Prone to heavy road puddles
-        signal: "Globe 3G / Smart LTE",
-        water: "Intermittent (Scheduled 6PM-9PM)",
-        distance: "10 min walk",
-        notes: "Affordable room for budgeting dormers. Access road gets ankle-deep during storm surges.",
-        phone: "+639091122334"
+        floodSafe: false,
+        backupWater: false,
+        distance: "11 min walk (850m)",
+        waterDesc: "No reserve tank. Scheduled rationing (6:00 AM - 9:00 AM only).",
+        floodDesc: "⚠️ High Flood Risk. Street experiences ankle-to-knee water in heavy rains.",
+        lighting: "Grade C: Dim interior alley. Flashlight recommended past 8:00 PM.",
+        policy: "Curfew: 9:30 PM strictly. Shared CR (1:6 ratio). Electric flat fee ₱300/mo. Budget option.",
+        phone: "+639097788112",
+        telco: [
+          { carrier: "Smart / TNT", signal: "LTE (2 Bars)", speed: "8 Mbps", status: "Spotty indoors" },
+          { carrier: "Globe / TM", signal: "3G / LTE (1 Bar)", speed: "3 Mbps", status: "Drops during video calls" },
+          { carrier: "DITO", signal: "No Service", speed: "--", status: "Unusable inside" }
+        ]
       },
       {
         id: 4,
-        name: "St. Jude Scholar Dorm",
+        name: "St. Thomas Academic Dorm",
+        score: 88,
         price: 2800,
-        address: "Bro. Raymund Jeffrey Rd.",
-        lat: 8.2405,
-        lng: 124.2415,
+        address: "Bro. Jeffrey St., Villaverde",
+        lat: 8.2438,
+        lng: 124.2405,
         vacantSlots: 0,
-        wifi: true,
-        privateCR: true,
+        fiveG: true,
+        privateCR: false,
         floodSafe: true,
-        signal: "All Networks Strong",
-        water: "Solar booster pump",
-        distance: "3 min walk (Gate 2)",
-        notes: "Currently full. Waitlist available for 2nd semester.",
-        phone: "+639205566778"
+        backupWater: true,
+        distance: "5 min walk (400m)",
+        waterDesc: "Dual stainless gravity tanks (24/7 continuous)",
+        floodDesc: "Elevated residential ridge. Zero flood history.",
+        lighting: "Grade B: Residential porch lights, paved sidewalk.",
+        policy: "Curfew: 10:00 PM. High-speed 100Mbps Wi-Fi included in rent. Study hall on 2nd floor.",
+        phone: "+639201239876",
+        telco: [
+          { carrier: "Smart / TNT", signal: "5G (4 Bars)", speed: "72 Mbps", status: "Fast & Stable" },
+          { carrier: "Globe / TM", signal: "LTE (3 Bars)", speed: "22 Mbps", status: "Good" },
+          { carrier: "DITO", signal: "5G (3 Bars)", speed: "45 Mbps", status: "Very Good" }
+        ]
       },
       {
         id: 5,
-        name: "Pinecrest Student Rooms",
-        price: 1800,
-        address: "Purok 12, San Miguel",
-        lat: 8.2452,
-        lng: 124.2458,
-        vacantSlots: 2,
-        wifi: true,
-        privateCR: false,
+        name: "Casa Serena Student Studios",
+        score: 96,
+        price: 4500,
+        address: "Andres Bonifacio Ave. (Across Overpass)",
+        lat: 8.2418,
+        lng: 124.2428,
+        vacantSlots: 1,
+        fiveG: true,
+        privateCR: true,
         floodSafe: true,
-        signal: "Smart 4G / Globe 4G",
-        water: "Overhead tank reserve",
-        distance: "8 min walk",
-        notes: "Quiet street, recommended for senior/thesis students.",
-        phone: "+639154433221"
-      }
-    ];
+        backupWater: true,
+        distance: "2 min walk (120m)",
+        waterDesc: "Deep-well backup + ICWS commercial line",
+        floodDesc: "Prime highway commercial strip. Completely flood-immune.",
+        lighting: "Grade A+: Active commercial streetlights, 24/7 convenience store beside gate.",
+        policy: "No curfew (RFID biometric entrance). Air-conditioned. In-room private bath. Sub-metered power.",
+        phone: "+639198765432",
+        telco: [
+          { carrier: "Smart / TNT", signal: "5G (Full)", speed: "210 Mbps", status: "Gigabit-grade" },
+          { carrier: "Globe / TM", signal: "5Here is a high-density set of mock platform metrics, listing stats, and user benchmarks structured for a compelling product pitch or UI demo for **LivablePH**.
 
-    // Environmental Overlays
-    // 1. Flood hazard simulation zone (Lower Tibanga low-lying ground)
-    const floodLayer = L.polygon([
-      [8.2385, 124.2455],
-      [8.2405, 124.2475],
-      [8.2388, 124.2490],
-      [8.2375, 124.2468]
-    ], {
-      color: '#f59e0b',
-      fillColor: '#f59e0b',
-      fillOpacity: 0.25,
-      weight: 1
-    }).bindTooltip("⚠️ Known Flash-Flood Drainage Corridor", { sticky: true });
+---
 
-    // 2. High 5G Signal Cell Coverage Zone (San Miguel / Main Rd)
-    const signalLayer = L.circle([8.2435, 124.2430], {
-      radius: 320,
-      color: '#0284c7',
-      fillColor: '#0284c7',
-      fillOpacity: 0.12,
-      dashArray: '4, 8'
-    }).bindTooltip("📶 High Density Smart/DITO 5G Coverage Area", { sticky: true });
+### Platform Impact & Traction (Key Highlights)
 
-    floodLayer.addTo(map);
-    signalLayer.addTo(map);
+* **18,500+** Verified student & young professional boarders housed across 14 major university hubs.
+* **4.2 Days** Average time-to-lease (vs. the traditional 21-day walk-in search cycle).
+* **₱1,850/month** Average user savings via direct-to-owner contracts (zero agent middleman fees).
+* **94.8%** Listing verification rate via our on-site 4-Point Safety & Amenity Audit.
+* **89%** Reduction in security deposit disputes through standard in-app digital lease agreements.
 
-    // Interactive Marker Storage
-    let markers = [];
+---
 
-    // Filter States
-    let activeFilters = {
-      search: "",
-      maxPrice: 3500,
-      wifi: false,
-      cr: false,
-      floodSafe: false,
-      vacant: false
-    };
+### Platform Performance & User Sentiment Benchmarks
 
-    function renderMarkersAndList() {
-      // Clear existing markers
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
+| Metric Category | Traditional Boarding Search | LivablePH Platform | Impact / Improvement |
+| :--- | :--- | :--- | :--- |
+| **Search Time** | 18–24 hours of on-foot walking | 15 minutes of in-app filtering | **88% time saved** |
+| **Price Transparency** | Hidden utility markups (water/Wi-Fi) | 100% itemized utility billing | **96% billing satisfaction** |
+| **Safety Compliance** | Unchecked fire exits & permits | BFP-inspected & lock-secure verified | **98.2% felt safer** |
+| **Roommate Matching** | Random assignment / gamble | Compatibility index (study/sleep habits) | **82% fewer lease breaks** |
+| **Landlord Response Time**| 12–36 hours (SMS/Call) | 18 minutes (In-App Chat) | **4.3x faster inquiry turnaround** |
 
-      const container = document.getElementById('listings-container');
-      container.innerHTML = "";
+---
 
-      const filtered = boardingHouses.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(activeFilters.search) || 
-                              item.address.toLowerCase().includes(activeFilters.search);
-        const matchesPrice = item.price <= activeFilters.maxPrice;
-        const matchesWifi = activeFilters.wifi ? item.wifi : true;
-        const matchesCr = activeFilters.cr ? item.privateCR : true;
-        const matchesFlood = activeFilters.floodSafe ? item.floodSafe : true;
-        const matchesVacant = activeFilters.vacant ? item.vacantSlots > 0 : true;
+### Core Feature Metrics (Demo Display Cards)
 
-        return matchesSearch && matchesPrice && matchesWifi && matchesCr && matchesFlood && matchesVacant;
-      });
+#### 1. Smart Compatibility & Roommate Matcher
+* **87% Match Accuracy:** Evaluates sleep schedules, study environment noise tolerance, visitor policies, and air-con usage habits.
+* **3,200+ Active Roommate Profiles:** Facilitates co-living cost reductions of up to **45% per room**.
 
-      document.getElementById('countHeader').innerText = `Showing ${filtered.length} Boarding Houses`;
+#### 2. Student & Budget Hotspot Analytics
+* **Median Monthly Rates:** Single non-AC (₱2,200 – ₱3,200) | Bedspace Shared (₱1,500 – ₱2,100) | Studio with AC (₱5,500 – ₱7,800).
+* **Proximity Index:** 74% of available listings are within a **5- to 10-minute walk** of university campus gates.
+* **Connectivity Guarantee:** 91% of top-rated student pads maintain dedicated fiber Wi-Fi connections averaging **45+ Mbps**.
 
-      filtered.forEach(item => {
-        // Create Card
-        const card = document.createElement('div');
-        card.className = 'dorm-card';
-        card.id = `card-${item.id}`;
-        card.innerHTML = `
-          <div class="dorm-title-row">
-            <div class="dorm-name">${item.name}</div>
-            <div class="dorm-price">₱${item.price.toLocaleString()}/mo</div>
-          </div>
-          <div class="dorm-location">${item.address} ·${item.distance}</div>
-          <div class="badge-row">
-            <span class="badge ${item.floodSafe ? 'badge-flood-safe' : 'badge-flood'}">
-              ${item.floodSafe ? '✓ Flood Safe' : '⚠️ Street Floods'}
-            </span>
-            <span class="badge badge-signal">${item.signal.split('/')[0]}</span>
-            <span class="badge badge-water">${item.vacantSlots > 0 ? item.vacantSlots + ' vacant' : 'Full'}</span>
-          </div>
-        `;
+#### 3. Landlord Reliability & Trust Score
+* **99.1% Verified Hosts:** ID verification and property ownership validation before listing approval.
+* **4.8 / 5.0 Average Landlord Rating:** Based on over **12,400 authenticated renter reviews**.
+* **Zero Phantom Deposits:** 100% of reservation downpayments are held in escrow until key turnover.
 
-        card.onclick = () => {
-          map.flyTo([item.lat, item.lng], 18, { duration: 1 });
-          openModal(item);
-        };
-        container.appendChild(card);
+---
 
-        // Create Map Marker
-        const marker = L.circleMarker([item.lat, item.lng], {
-          radius: 8,
-          fillColor: item.vacantSlots > 0 ? '#10b981' : '#6b7280',
-          color: '#ffffff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.95
-        }).addTo(map);
-
-        marker.bindPopup(`<b>${item.name}</b><br>₱${item.price}/mo · ${item.distance}`);
-        marker.on('click', () => {
-          openModal(item);
-          highlightCard(item.id);
-        });
-
-        markers.push(marker);
-      });
-    }
-
-    function highlightCard(id) {
-      document.querySelectorAll('.dorm-card').forEach(c => c.classList.remove('active'));
-      const activeCard = document.getElementById(`card-${id}`);
-      if (activeCard) {
-        activeCard.classList.add('active');
-        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-
-    function openModal(item) {
-      document.getElementById('mName').innerText = item.name;
-      document.getElementById('mLocation').innerText = `${item.address} (Approx.${item.distance} from campus)`;
-      document.getElementById('mPrice').innerText = `₱${item.price.toLocaleString()} / month`;
-      document.getElementById('mSlots').innerText = item.vacantSlots > 0 ? `${item.vacantSlots} Bedspace/Room Available` : "No vacancies currently";
-      document.getElementById('mSignal').innerText = item.signal;
-      document.getElementById('mWater').innerText = item.water;
-      document.getElementById('mFlood').innerText = item.floodSafe ? "Safe (Elevated Ground)" : "Prone to street puddle / ankle runoff";
-      document.getElementById('mDistance').innerText = item.distance;
-      document.getElementById('mNotes').innerText = item.notes;
-      document.getElementById('mContactBtn').href = `tel:${item.phone}`;
-      document.getElementById('modal').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('active');
-    }
-
-    // Event Listeners
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      activeFilters.search = e.target.value.toLowerCase();
-      renderMarkersAndList();
-    });
-
-    const priceSlider = document.getElementById('priceRange');
-    const priceLabel = document.getElementById('priceLabel');
-    priceSlider.addEventListener('input', (e) => {
-      activeFilters.maxPrice = parseInt(e.target.value);
-      priceLabel.innerText = `₱${parseInt(e.target.value).toLocaleString()}`;
-      renderMarkersAndList();
-    });
-
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        chip.classList.toggle('active');
-        const filterKey = chip.getAttribute('data-filter');
-        activeFilters[filterKey] = chip.classList.contains('active');
-        renderMarkersAndList();
-      });
-    });
-
-    // Layer Controls
-    document.getElementById('toggleFlood').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        map.addLayer(floodLayer);
-      } else {
-        map.removeLayer(floodLayer);
-      }
-    });
-
-    document.getElementById('toggleSignal').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        map.addLayer(signalLayer);
-      } else {
-        map.removeLayer(signalLayer);
-      }
-    });
-
-    // Close modal on outside click
-    document.getElementById('modal').addEventListener('click', (e) => {
-      if (e.target.id === 'modal') closeModal();
-    });
-
-    // Initial Render
-    renderMarkersAndList();
-  </script>
-</body>
-</html>
+<ElicitationsGroup message="To help flesh out the rest of your demo:">
+  <Elicitation label="Generate mock JSON database records" query="Generate a realistic mock JSON dataset for 5 boarding house listings for the LivablePH demo, including amenities, pricing, coordinates, and landlord verification status." />
+  <Elicitation label="Draft landing page hero and UI copy" query="Write compelling landing page copy, value propositions, and call-to-action buttons for the LivablePH boarding house platform demo." />
+</ElicitationsGroup>
