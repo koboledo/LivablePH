@@ -3,35 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LivablePH — MSU-IIT Student Housing Intelligence</title>
+  <title>LivablePH — MSU-IIT Student Housing</title>
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg: #090e17;
-      --card-bg: #111827;
-      --card-hover: #172235;
-      --card-border: #1f2937;
+      --panel-bg: #111827;
+      --card-bg: #162032;
+      --border: #243247;
       --primary: #0284c7;
-      --primary-hover: #0369a1;
       --accent: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
       --text: #f3f4f6;
-      --text-muted: #9ca3af;
-      --sidebar-width: 440px;
+      --text-muted: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
@@ -40,192 +38,163 @@
       overflow: hidden;
     }
 
+    /* Sidebar */
     #sidebar {
-      width: var(--sidebar-width);
-      min-width: var(--sidebar-width);
+      width: 440px;
+      min-width: 440px;
       height: 100%;
-      background: var(--card-bg);
-      border-right: 1px solid var(--card-border);
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       z-index: 1000;
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
     }
 
-    .brand-header {
-      padding: 18px 24px;
-      border-bottom: 1px solid var(--card-border);
-      background: #0d131f;
+    .header {
+      padding: 16px 20px;
+      background: #0c1320;
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .brand-title {
+    .brand {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
-      letter-spacing: -0.5px;
     }
 
-    .brand-title span { color: var(--primary); }
+    .brand span { color: var(--primary); }
 
-    .campus-badge {
-      font-family: 'Space Mono', monospace;
+    .hub-badge {
       font-size: 11px;
       padding: 3px 8px;
       background: rgba(2, 132, 199, 0.15);
-      border: 1px solid rgba(2, 132, 199, 0.4);
+      border: 1px solid var(--primary);
       color: #38bdf8;
       border-radius: 4px;
+      font-weight: 600;
     }
 
+    /* Filters */
     .filter-panel {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--card-border);
-      background: #111827;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .search-input {
-      background: #182234;
-      border: 1px solid #283548;
-      padding: 10px 14px;
-      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border-radius: 6px;
       color: #fff;
       font-size: 13px;
       outline: none;
-      width: 100%;
     }
 
     .search-input:focus { border-color: var(--primary); }
 
-    .range-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .range-label {
-      font-size: 12px;
-      color: var(--text-muted);
+    .price-row {
       display: flex;
       justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
     }
 
     input[type="range"] {
       accent-color: var(--primary);
       width: 100%;
-      cursor: pointer;
     }
 
-    .chip-container {
+    .chips {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
 
     .chip {
-      background: #182234;
-      border: 1px solid #283548;
-      padding: 5px 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
       border-radius: 6px;
       font-size: 11px;
       color: var(--text-muted);
       cursor: pointer;
       user-select: none;
-      transition: all 0.15s ease;
+      transition: 0.15s;
     }
 
     .chip.active {
       background: var(--primary);
-      color: white;
+      color: #fff;
       border-color: var(--primary);
       font-weight: 600;
     }
 
-    .list-header {
+    .list-info {
       padding: 10px 20px 6px;
       font-size: 11px;
-      font-family: 'Space Mono', monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
-    #listings-container {
+    /* Listings */
+    #listings {
       flex: 1;
       overflow-y: auto;
-      padding: 0 16px 20px;
+      padding: 0 16px 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .dorm-card {
-      background: #141d2d;
-      border: 1px solid #233044;
-      border-radius: 10px;
-      padding: 14px 16px;
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: 0.15s;
     }
 
-    .dorm-card:hover {
-      background: var(--card-hover);
-      border-color: var(--primary);
-      transform: translateY(-2px);
-    }
+    .card:hover { border-color: var(--primary); }
+    .card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4); }
 
-    .dorm-card.active {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4);
-    }
-
-    .dorm-title-row {
+    .card-head {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       margin-bottom: 4px;
     }
 
-    .dorm-name {
-      font-weight: 600;
-      font-size: 15px;
-      color: #fff;
-    }
-
-    .dorm-score {
-      font-family: 'Space Mono', monospace;
+    .card-title { font-size: 14px; font-weight: 600; color: #fff; }
+    .card-score {
       font-size: 11px;
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: 700;
+      background: #064e3b;
+      color: #6ee7b7;
     }
 
-    .score-high { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
-    .score-med { background: #78350f; color: #fde68a; border: 1px solid #d97706; }
-    .score-low { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
-
-    .dorm-price-row {
-      display: flex;
-      justify-content: space-between;
+    .card-sub {
       font-size: 12px;
       color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 8px;
     }
 
-    .dorm-price {
-      font-size: 14px;
-      font-weight: 700;
-      color: #38bdf8;
-    }
+    .card-price { color: #38bdf8; font-weight: 700; }
 
-    .badge-row {
+    .badges {
       display: flex;
       gap: 5px;
       flex-wrap: wrap;
@@ -233,317 +202,397 @@
 
     .badge {
       font-size: 10px;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
-    .badge-green { background: #064e3b; color: #6ee7b7; }
-    .badge-amber { background: #451a03; color: #fde68a; }
-    .badge-blue { background: #1e3a8a; color: #93c5fd; }
-    .badge-gray { background: #1f2937; color: #cbd5e1; }
+    .b-green { background: #064e3b; color: #6ee7b7; }
+    .b-blue { background: #1e3a8a; color: #93c5fd; }
+    .b-warn { background: #451a03; color: #fde68a; }
 
-    #map-container {
-      flex: 1;
-      height: 100%;
-      position: relative;
-    }
+    /* Map */
+    #map-container { flex: 1; height: 100%; position: relative; }
+    #map { width: 100%; height: 100%; background: #070b12; }
 
-    #map { width: 100%; height: 100%; background: #0a0f1d; }
-
-    .map-controls {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      z-index: 1000;
-      background: rgba(17, 24, 39, 0.94);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(10px);
-      padding: 14px 18px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    }
-
-    .map-controls-title {
-      font-weight: 700;
-      font-family: 'Space Mono', monospace;
-      color: var(--text);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .map-control-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    .map-control-item input { accent-color: var(--primary); }
-
+    /* Detail Modal */
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      z-index: 2000;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
+      z-index: 2000;
     }
 
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.open { display: flex; }
 
-    .modal-content {
-      background: #111827;
-      border: 1px solid #374151;
-      width: 92%;
-      max-width: 620px;
-      border-radius: 14px;
-      padding: 26px;
-      position: relative;
-      max-height: 90vh;
+    .modal {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 520px;
+      max-height: 85vh;
       overflow-y: auto;
+      position: relative;
     }
 
     .modal-close {
       position: absolute;
-      top: 18px;
-      right: 18px;
-      background: #1f2937;
-      border: none;
-      color: #9ca3af;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close:hover { color: #fff; background: #374151; }
-
-    .modal-header-tag {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .modal-title {
-      font-family: 'Space Grotesk', sans-serif;
+      top: 16px; right: 16px;
+      background: none; border: none;
+      color: var(--text-muted);
       font-size: 22px;
-      margin-top: 2px;
-      color: #fff;
+      cursor: pointer;
     }
 
-    .modal-location {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-family: 'Space Mono', monospace;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .metrics-grid {
+    .modal-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 18px;
+      margin: 16px 0;
     }
 
-    .metric-box {
-      background: #182234;
-      border: 1px solid #233044;
-      padding: 10px 14px;
-      border-radius: 8px;
+    .m-item {
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 6px;
     }
 
-    .metric-label { font-size: 11px; color: var(--text-muted); }
-    .metric-value { font-size: 14px; font-weight: 600; color: #f3f4f6; margin-top: 3px; }
-
-    .telco-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      margin-bottom: 18px;
-      background: #141d2d;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #233044;
-    }
-
-    .telco-table th, .telco-table td {
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    .telco-table th {
-      background: #1a2538;
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    .telco-table td { border-top: 1px solid #1f2a3c; }
+    .m-label { font-size: 11px; color: var(--text-muted); }
+    .m-val { font-size: 13px; font-weight: 600; color: #fff; margin-top: 2px; }
 
     .btn-contact {
       display: block;
       width: 100%;
       text-align: center;
       background: var(--primary);
-      color: white;
+      color: #fff;
       text-decoration: none;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: 600;
-      font-size: 14px;
-      transition: background 0.2s;
+      font-size: 13px;
     }
 
-    .btn-contact:hover { background: var(--primary-hover); }
-
-    @media (max-width: 860px) {
+    @media (max-width: 768px) {
       body { flex-direction: column-reverse; }
       #sidebar { width: 100%; min-width: 100%; height: 50vh; }
       #map-container { height: 50vh; }
-      .metrics-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
   <div id="sidebar">
-    <div class="brand-header">
-      <div>
-        <div class="brand-title">Livable<span>PH</span></div>
-        <div style="font-size: 11px; color: var(--text-muted);">MSU-IIT Student Housing Intelligence</div>
-      </div>
-      <div class="campus-badge">ILIGAN HUB</div>
+    <div class="header">
+      <div class="brand">Livable<span>PH</span></div>
+      <div class="hub-badge">MSU-IIT TIBANGA</div>
     </div>
 
     <div class="filter-panel">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search by name, street, or landmark..." />
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by dorm, street, or landlord..." />
 
-      <div class="range-group">
-        <div class="range-label">
-          <span>Max Monthly Rent</span>
-          <span id="priceLabel" style="font-family: 'Space Mono', monospace; color: #38bdf8; font-weight: 700;">₱4,000</span>
-        </div>
-        <input type="range" id="priceRange" min="1200" max="6000" step="200" value="4000" />
+      <div class="price-row">
+        <span>Max Monthly Rent</span>
+        <span id="priceDisplay" style="color:#38bdf8; font-weight:600;">₱3,500</span>
       </div>
+      <input type="range" id="priceRange" min="1500" max="6000" step="250" value="3500" />
 
-      <div class="chip-container">
-        <div class="chip" data-filter="vacant">🟢 Available Now</div>
-        <div class="chip" data-filter="fiveG">📶 5G Ready</div>
-        <div class="chip" data-filter="floodSafe">🛡️ Zero Flood Risk</div>
-        <div class="chip" data-filter="privateCR">🚿 Private CR</div>
-        <div class="chip" data-filter="backupWater">💧 Water Tank</div>
+      <div class="chips">
+        <div class="chip" data-key="wifi">⚡ Strong Wi-Fi</div>
+        <div class="chip" data-key="floodSafe">🛡️ Zero Flood</div>
+        <div class="chip" data-key="water">💧 24/7 Water</div>
+        <div class="chip" data-key="cool">❄️ Low Heat Index</div>
+        <div class="chip" data-key="near">🚶 < 5 min Walk</div>
       </div>
     </div>
 
-    <div class="list-header">
-      <span id="countHeader">10 Listings Found</span>
-      <span>Sorted by Livability Score</span>
+    <div class="list-info">
+      <span id="countText">0 Listings</span>
+      <span>Ranked by Livability</span>
     </div>
 
-    <div id="listings-container"></div>
+    <div id="listings"></div>
   </div>
 
   <div id="map-container">
     <div id="map"></div>
+  </div>
 
-    <div class="map-controls">
-      <div class="map-controls-title">Environmental Layers</div>
-      <label class="map-control-item">
-        <input type="checkbox" id="toggleFlood" checked />
-        <span>⚠️ DOST-NOAH Flood Basin (5-Yr)</span>
-      </label>
-      <label class="map-control-item">
-        <input type="checkbox" id="toggleSignal" checked />
-        <span>📶 Smart/DITO 5G Corridor</span>
-      </label>
-      <label class="map-control-item">
-        <input type="checkbox" id="toggleWalk" checked />
-        <span>🚶 Lit Campus Pedestrian Corridors</span>
-      </label>
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 id="mName" style="font-size: 18px; margin-bottom: 2px;"></h2>
+      <p id="mAddress" style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"></p>
+
+      <div class="modal-grid">
+        <div class="m-item"><div class="m-label">Rent</div><div class="m-val" id="mPrice"></div></div>
+        <div class="m-item"><div class="m-label">Campus Proximity</div><div class="m-val" id="mDist"></div></div>
+        <div class="m-item"><div class="m-label">Cellular & Wi-Fi</div><div class="m-val" id="mSignal"></div></div>
+        <div class="m-item"><div class="m-label">Water Reliability</div><div class="m-val" id="mWater"></div></div>
+        <div class="m-item"><div class="m-label">Flood Risk Profile</div><div class="m-val" id="mFlood"></div></div>
+        <div class="m-item"><div class="m-label">Ventilation / Heat Index</div><div class="m-val" id="mHeat"></div></div>
+      </div>
+
+      <p id="mNotes" style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; background: #0f172a; padding: 10px; border-radius: 6px;"></p>
+
+      <a href="#" id="mCallBtn" class="btn-contact">Inquire with Caretaker</a>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">&times;</button>
-      <div class="modal-header-tag" id="mTag">VERIFIED RESIDENCE · SCORE 94/100</div>
-      <div class="modal-title" id="mName">Dormitory Name</div>
-      <div class="modal-location" id="mLocation">Tibanga, Iligan City</div>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-      <div class="section-label">LIVABILITY & NEIGHBORHOOD AUDIT</div>
-      <div class="metrics-grid">
-        <div class="metric-box">
-          <div class="metric-label">Monthly Rate</div>
-          <div class="metric-value" id="mPrice">₱2,400/mo</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Available Slots</div>
-          <div class="metric-value" id="mSlots">3 Vacant</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Water Reliability (24/7)</div>
-          <div class="metric-value" id="mWater">Gravity Tank Reserve</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">DOST NOAH Flood History</div>
-          <div class="metric-value" id="mFlood">Elevated / Zero Runoff</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Campus Proximity</div>
-          <div class="metric-value" id="mWalk">3 min walk (250m)</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Night Walkability & Lighting</div>
-          <div class="metric-value" id="mLighting">Well-Lit Main Thoroughfare</div>
-        </div>
-      </div>
+  <script>
+    // Initialize Map at MSU-IIT, Iligan City
+    const map = L.map('map').setView([8.2418, 124.2440], 16);
 
-      <div class="section-label">INDOOR CELLULAR AUDIT (7 PM - 11 PM PEAK TEST)</div>
-      <table class="telco-table">
-        <thead>
-          <tr>
-            <th>Carrier</th>
-            <th>Signal</th>
-            <th>Avg Speed</th>
-            <th>Study Suitability</th>
-          </tr>
-        </thead>
-        <tbody id="mTelcoBody"></tbody>
-      </table>
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }).addTo(map);
 
-      <div class="section-label">TERMS & HOUSE POLICIES</div>
-      <div style="background: #141d2d; border: 1px solid #233044; border-You haven't told me what kind of website you're building yet! 
+    // MSU-IIT Campus Anchor Pin
+    L.circleMarker([8.2415, 124.2438], {
+      radius: 8,
+      fillColor: '#ef4444',
+      color: '#ffffff',
+      weight: 2,
+      fillOpacity: 1
+    }).addTo(map).bindPopup("<b>MSU-IIT Main Campus</b><br>Tibanga Overpass");
 
-Which one are we making?
+    // Boarding Houses Dataset around IIT
+    const data = [
+      {
+        id: 1,
+        name: "Scholar's Haven Dormitory",
+        address: "Purok 4, Tibanga (Behind Gate 1)",
+        lat: 8.2430, lng: 124.2445,
+        price: 2400,
+        score: 95,
+        walkMinutes: 3,
+        wifi: true,
+        floodSafe: true,
+        water: true,
+        cool: true,
+        signal: "Fiber Wi-Fi + Smart 5G",
+        waterDesc: "24/7 with overhead gravity tank",
+        floodDesc: "High ground; zero water accumulation",
+        heatDesc: "High ceilings, shaded front courtyard",
+        phone: "+639170001122",
+        notes: "Curfew 10 PM. Sub-metered electricity. Female boarders only."
+      },
+      {
+        id: 2,
+        name: "San Miguel Student Pad",
+        address: "San Miguel Highway",
+        lat: 8.2452, lng: 124.2422,
+        price: 3200,
+        score: 92,
+        walkMinutes: 6,
+        wifi: true,
+        floodSafe: true,
+        water: true,
+        cool: false,
+        signal: "DITO 5G / Globe LTE",
+        waterDesc: "Constant pressure + secondary pump",
+        floodDesc: "Flood safe (elevated street)",
+        heatDesc: "Exposed to afternoon sun; fan recommended",
+        phone: "+639180002233",
+        notes: "No curfew (biometric gate). Visitors allowed until 8 PM."
+      },
+      {
+        id: 3,
+        name: "Riverside Annex Bedspace",
+        address: "Lower Tibanga Creek Alley",
+        lat: 8.2392, lng: 124.2468,
+        price: 1600,
+        score: 64,
+        walkMinutes: 9,
+        wifi: false,
+        floodSafe: false,
+        water: false,
+        cool: true,
+        signal: "Spotty LTE indoors",
+        waterDesc: "Scheduled rationing (6 AM - 9 AM only)",
+        floodDesc: "Prone to ankle-deep puddles during downpours",
+        heatDesc: "Lush vegetation nearby, cool nights",
+        phone: "+639090003344",
+        notes: "Budget shared room (4 pax). Electricity flat rate ₱250/mo."
+      },
+      {
+        id: 4,
+        name: "Villaverde Academic Residence",
+        address: "Bro. Jeffrey St., Villaverde",
+        lat: 8.2440, lng: 124.2405,
+        price: 2800,
+        score: 89,
+        walkMinutes: 4,
+        wifi: true,
+        floodSafe: true,
+        water: true,
+        cool: true,
+        signal: "Dual-band Wi-Fi (Smart & Globe)",
+        waterDesc: "Deep well + ICWS dual setup",
+        floodDesc: "Elevated residential ridge",
+        heatDesc: "Concrete insulated roof slab",
+        phone: "+639200004455",
+        notes: "Study hall available. Quiet environment for thesis students."
+      },
+      {
+        id: 5,
+        name: "Bonifacio Loft & Studios",
+        address: "Andres Bonifacio Ave. (Across IIT)",
+        lat: 8.2418, lng: 124.2425,
+        price: 4500,
+        score: 97,
+        walkMinutes: 2,
+        wifi: true,
+        floodSafe: true,
+        water: true,
+        cool: true,
+        signal: "Gigabit Fiber + Full 5G",
+        waterDesc: "Commercial grade constant pressure",
+        floodDesc: "Main avenue (zero flooding)",
+        heatDesc: "Air-conditioned units only",
+        phone: "+639190005566",
+        notes: "Private CR per studio. Induction stove permitted."
+      }
+    ];
 
-* **Video editing / filmmaking portfolio** (showcasing reels, client work, project breakdowns)
-* **Personal / student portfolio** (about me, projects, resume/skills, contact)
-* **A gift or interactive page** (like an anniversary / celebration letter)
-* **A web tool or dashboard** (calculators, interactive models, trackers)
+    let activeMarkers = [];
+    let filterState = {
+      search: "",
+      maxPrice: 3500,
+      wifi: false,
+      floodSafe: false,
+      water: false,
+      cool: false,
+      near: false
+    };
 
-Let me know what you need, along with the stack you prefer (pure HTML/Tailwind/CSS, React, Next.js, etc.), and we'll build it out.
+    function render() {
+      // Clear markers
+      activeMarkers.forEach(m => map.removeLayer(m));
+      activeMarkers = [];
+
+      const listContainer = document.getElementById('listings');
+      listContainer.innerHTML = "";
+
+      const filtered = data.filter(d => {
+        const matchSearch = d.name.toLowerCase().includes(filterState.search) || 
+                            d.address.toLowerCase().includes(filterState.search);
+        const matchPrice = d.price <= filterState.maxPrice;
+        const matchWifi = filterState.wifi ? d.wifi : true;
+        const matchFlood = filterState.floodSafe ? d.floodSafe : true;
+        const matchWater = filterState.water ? d.water : true;
+        const matchCool = filterState.cool ? d.cool : true;
+        const matchNear = filterState.near ? d.walkMinutes <= 5 : true;
+
+        return matchSearch && matchPrice && matchWifi && matchFlood && matchWater && matchCool && matchNear;
+      });
+
+      document.getElementById('countText').innerText = `${filtered.length} Boarding Houses`;
+
+      filtered.forEach(item => {
+        // Build card
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `item-${item.id}`;
+        card.innerHTML = `
+          <div class="card-head">
+            <div class="card-title">${item.name}</div>
+            <div class="card-score">${item.score}/100</div>
+          </div>
+          <div class="card-sub">
+            <span>${item.address}</span>
+            <span class="card-price">₱${item.price.toLocaleString()}/mo</span>
+          </div>
+          <div class="badges">
+            <span class="badge ${item.floodSafe ? 'b-green' : 'b-warn'}">${item.floodSafe ? '✓ Flood Safe' : '⚠️ Street Ponding'}</span>
+            <span class="badge ${item.water ? 'b-blue' : 'b-warn'}">${item.water ? '💧 24/7 Water' : '⏳ Water Rationed'}</span>
+            <span class="badge b-blue">${item.walkMinutes} min walk</span>
+          </div>
+        `;
+
+        card.onclick = () => selectItem(item);
+        listContainer.appendChild(card);
+
+        // Build marker
+        const marker = L.circleMarker([item.lat, item.lng], {
+          radius: 7,
+          fillColor: item.floodSafe ? '#10b981' : '#f59e0b',
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 1
+        }).addTo(map);
+
+        marker.bindPopup(`<b>${item.name}</b><br>₱${item.price}/mo`);
+        marker.on('click', () => selectItem(item));
+        activeMarkers.push(marker);
+      });
+    }
+
+    function selectItem(item) {
+      map.flyTo([item.lat, item.lng], 17, { duration: 0.8 });
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      const el = document.getElementById(`item-${item.id}`);
+      if (el) el.classList.add('active');
+
+      // Populate Modal
+      document.getElementById('mName').innerText = item.name;
+      document.getElementById('mAddress').innerText = item.address;
+      document.getElementById('mPrice').innerText = `₱${item.price.toLocaleString()}/month`;
+      document.getElementById('mDist').innerText = `${item.walkMinutes} min walk to campus`;
+      document.getElementById('mSignal').innerText = item.signal;
+      document.getElementById('mWater').innerText = item.waterDesc;
+      document.getElementById('mFlood').innerText = item.floodDesc;
+      document.getElementById('mHeat').innerText = item.heatDesc;
+      document.getElementById('mNotes').innerText = `House Rules: ${item.notes}`;
+      document.getElementById('mCallBtn').href = `tel:${item.phone}`;
+
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    // Filter Listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      filterState.search = e.target.value.toLowerCase();
+      render();
+    });
+
+    const range = document.getElementById('priceRange');
+    const priceDisplay = document.getElementById('priceDisplay');
+    range.addEventListener('input', (e) => {
+      filterState.maxPrice = parseInt(e.target.value);
+      priceDisplay.innerText = `₱${filterState.maxPrice.toLocaleString()}`;
+      render();
+    });
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+        const key = chip.getAttribute('data-key');
+        filterState[key] = chip.classList.contains('active');
+        render();
+      });
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    // Run Initial Load
+    render();
+  </script>
+</body>
+</html>
